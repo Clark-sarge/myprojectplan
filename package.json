@@ -1,0 +1,11 @@
+{
+  "name": "myprojectplan",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser-based Gantt chart builder with CSV export",
+  "scripts": {
+    "test": "node --test tests/",
+    "start": "npx serve ."
+  }
+}
