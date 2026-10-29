@@ -132,31 +132,26 @@
   function sampleProject() {
     var p = createProject('Website Launch', todayIso());
 
-    var requirements = createTask('Requirements', { durationDays: 3 });
-    var budget = createTask('Budget approval', { durationDays: 2, dependsOn: [requirements.id] });
-    p.tasks.push(createTask('Planning', { durationDays: 5 }));
-    p.tasks.push(requirements);
-    p.tasks.push(budget);
+    var planning = createTask('Planning', { durationDays: 5 });
+    var requirements = createTask('Requirements', { parentId: planning.id, durationDays: 3 });
+    var budget = createTask('Budget approval', { parentId: planning.id, durationDays: 2, dependsOn: [requirements.id] });
+    p.tasks.push(planning, requirements, budget);
 
-    var wireframes = createTask('Wireframes', { durationDays: 4, dependsOn: [requirements.id] });
-    var visual = createTask('Visual design', { durationDays: 5, dependsOn: [wireframes.id] });
-    p.tasks.push(createTask('Design', { durationDays: 9 }));
-    p.tasks.push(wireframes);
-    p.tasks.push(visual);
+    var design = createTask('Design', { durationDays: 9 });
+    var wireframes = createTask('Wireframes', { parentId: design.id, durationDays: 4, dependsOn: [requirements.id] });
+    var visual = createTask('Visual design', { parentId: design.id, durationDays: 5, dependsOn: [wireframes.id] });
+    p.tasks.push(design, wireframes, visual);
 
-    var frontend = createTask('Frontend build', { durationDays: 8, dependsOn: [visual.id] });
-    var backend = createTask('Backend build', { durationDays: 6, dependsOn: [wireframes.id] });
-    var integration = createTask('Integration', { durationDays: 3, dependsOn: [frontend.id, backend.id] });
-    p.tasks.push(createTask('Development', { durationDays: 11 }));
-    p.tasks.push(frontend);
-    p.tasks.push(backend);
-    p.tasks.push(integration);
+    var development = createTask('Development', { durationDays: 11 });
+    var frontend = createTask('Frontend build', { parentId: development.id, durationDays: 8, dependsOn: [visual.id] });
+    var backend = createTask('Backend build', { parentId: development.id, durationDays: 6, dependsOn: [wireframes.id] });
+    var integration = createTask('Integration', { parentId: development.id, durationDays: 3, dependsOn: [frontend.id, backend.id] });
+    p.tasks.push(development, frontend, backend, integration);
 
-    var testing = createTask('Testing', { durationDays: 4, dependsOn: [integration.id] });
-    var deploy = createTask('Deploy', { durationDays: 1, dependsOn: [testing.id] });
-    p.tasks.push(createTask('Launch', { durationDays: 5 }));
-    p.tasks.push(testing);
-    p.tasks.push(deploy);
+    var launch = createTask('Launch', { durationDays: 5 });
+    var testing = createTask('Testing', { parentId: launch.id, durationDays: 4, dependsOn: [integration.id] });
+    var deploy = createTask('Deploy', { parentId: launch.id, durationDays: 1, dependsOn: [testing.id] });
+    p.tasks.push(launch, testing, deploy);
 
     return p;
   }
