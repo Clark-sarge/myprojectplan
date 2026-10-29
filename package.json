@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Browser-based Gantt chart builder with CSV export",
   "scripts": {
-    "test": "node --test tests/",
+    "test": "node --test",
     "start": "npx serve ."
   }
 }
