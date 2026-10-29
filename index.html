@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>myProjectPlan — Build</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">my<span>ProjectPlan</span></a>
+    <div class="topbar-actions">
+      <button type="button" id="btn-sample" class="btn ghost">Load sample</button>
+      <button type="button" id="btn-clear" class="btn ghost danger">Clear all</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card project-meta">
+      <h1>Build your project plan</h1>
+      <p class="subtitle">List tasks, add subtasks, set durations and dependencies — then build your Gantt chart.</p>
+      <div class="meta-grid">
+        <label>Project name
+          <input type="text" id="project-name" placeholder="e.g. Website Launch">
+        </label>
+        <label>Project start date
+          <input type="date" id="project-start">
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="tasks-header">
+        <h2>Tasks</h2>
+        <button type="button" id="btn-add-task" class="btn primary">+ Add task</button>
+      </div>
+      <div class="task-list-head">
+        <span>#</span><span></span><span>Task</span><span>Days</span><span>Earliest day</span><span>Depends on</span><span></span>
+      </div>
+      <div id="task-list"></div>
+      <p id="tasks-empty" class="empty">No tasks yet — click “+ Add task” to get started, or load the sample project.</p>
+    </section>
+
+    <section id="error-panel" class="card errors hidden"></section>
+
+    <div class="build-actions">
+      <button type="button" id="btn-build" class="btn primary large">Build Gantt Chart &#8594;</button>
+    </div>
+  </main>
+
+  <footer class="footer">myProjectPlan &mdash; your project is saved automatically in this browser.</footer>
+
+  <script src="js/model.js"></script>
+  <script src="js/scheduler.js"></script>
+  <script src="js/build.js"></script>
+</body>
+</html>
