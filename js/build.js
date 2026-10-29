@@ -12,6 +12,7 @@
     empty: document.getElementById('tasks-empty'),
     errors: document.getElementById('error-panel'),
     build: document.getElementById('btn-build'),
+    exportCsv: document.getElementById('btn-export-csv'),
     addTask: document.getElementById('btn-add-task'),
     sample: document.getElementById('btn-sample'),
     clear: document.getElementById('btn-clear')
@@ -342,6 +343,11 @@
 
   els.build.addEventListener('click', function () {
     if (validateAndSchedule()) global.location.href = 'chart.html';
+  });
+
+  els.exportCsv.addEventListener('click', function () {
+    var sched = validateAndSchedule();
+    if (sched) global.MPP.csv.exportProjectCsv(state, sched);
   });
 
   render();
