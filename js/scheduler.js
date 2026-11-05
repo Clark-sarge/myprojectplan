@@ -105,20 +105,66 @@
     var projectStart = new Date(project.startDate + 'T00:00:00');
     if (isNaN(projectStart.getTime())) projectStart = new Date();
 
-    var rows = [];
+    // Project length is the latest end across all tasks.
     var totalDays = 0;
+    tasks.forEach(function (t) {
+      var end = computed[t.id].end;
+      if (end > totalDays) totalDays = end;
+    });
+
+    // Backward pass: latest finish/start per leaf task; slack = LS - ES.
+    var successors = {};
+    tasks.forEach(function (t) {
+      (expandedDeps[t.id] || []).forEach(function (depId) {
+        (successors[depId] = successors[depId] || []).push(t.id);
+      });
+    });
+
+    var lfMemo = {};
+    function latestFinish(taskId) {
+      if (lfMemo[taskId] != null) return lfMemo[taskId];
+      var succs = successors[taskId] || [];
+      var lf = totalDays;
+      if (succs.length > 0) {
+        lf = Infinity;
+        succs.forEach(function (s) {
+          var ls = latestFinish(s) - (computed[s].end - computed[s].start);
+          if (ls < lf) lf = ls;
+        });
+      }
+      lfMemo[taskId] = lf;
+      return lf;
+    }
+
+    // Summaries are critical when any subtask is; their slack is the minimum.
+    var cpInfo = {};
+    tasks.forEach(function (t) {
+      if ((childrenBy[t.id] || []).length > 0) return;
+      var r = computed[t.id];
+      var slack = latestFinish(t.id) - (r.end - r.start) - r.start;
+      cpInfo[t.id] = { critical: slack === 0, slack: slack };
+    });
+    tasks.forEach(function (t) {
+      var kids = childrenBy[t.id] || [];
+      if (kids.length === 0) return;
+      var crit = false;
+      var minSlack = Infinity;
+      kids.forEach(function (k) {
+        if (cpInfo[k.id].critical) crit = true;
+        if (cpInfo[k.id].slack < minSlack) minSlack = cpInfo[k.id].slack;
+      });
+      cpInfo[t.id] = { critical: crit, slack: minSlack };
+    });
+
+    var rows = [];
     var topIndex = 0;
 
     (childrenBy['_root'] || []).forEach(function (t) {
       topIndex += 1;
       var kids = childrenBy[t.id] || [];
-      var r = computed[t.id];
-      totalDays = Math.max(totalDays, r.end);
-      rows.push(makeRow(t, String(topIndex), 0, kids.length ? 'summary' : 'task', r, map, projectStart));
+      rows.push(makeRow(t, String(topIndex), 0, kids.length ? 'summary' : 'task', computed[t.id], map, projectStart, cpInfo[t.id]));
       kids.forEach(function (k, i) {
-        var kr = computed[k.id];
-        totalDays = Math.max(totalDays, kr.end);
-        rows.push(makeRow(k, topIndex + '.' + (i + 1), 1, 'subtask', kr, map, projectStart));
+        rows.push(makeRow(k, topIndex + '.' + (i + 1), 1, 'subtask', computed[k.id], map, projectStart, cpInfo[k.id]));
       });
     });
 
@@ -132,7 +178,7 @@
     };
   }
 
-  function makeRow(task, wbs, level, type, r, map, projectStart) {
+  function makeRow(task, wbs, level, type, r, map, projectStart, cp) {
     var parent = task.parentId ? map[task.parentId] : null;
     return {
       id: task.id,
@@ -147,7 +193,9 @@
       startDate: addDays(projectStart, r.start),
       endDate: addDays(projectStart, r.end - 1),
       dependsOn: (task.dependsOn || []).slice(),
-      notes: task.notes || ''
+      notes: task.notes || '',
+      slackDays: cp.slack,
+      critical: cp.critical
     };
   }
 

@@ -153,3 +153,58 @@ test('sample project schedules successfully', () => {
   assert.equal(byName(sched, 'Deploy').startDay, 27);
   assert.equal(sched.totalDays, 28);
 });
+
+test('a simple chain is all critical with zero slack', () => {
+  const a = M.createTask('A', { durationDays: 2 });
+  const b = M.createTask('B', { durationDays: 3, dependsOn: [a.id] });
+  const sched = S.scheduleProject(proj([a, b]));
+  assert.equal(byName(sched, 'A').critical, true);
+  assert.equal(byName(sched, 'A').slackDays, 0);
+  assert.equal(byName(sched, 'B').critical, true);
+  assert.equal(byName(sched, 'B').slackDays, 0);
+});
+
+test('the longer of two parallel paths is critical; the other has slack', () => {
+  const a = M.createTask('A', { durationDays: 2 });
+  const b = M.createTask('B', { durationDays: 5, dependsOn: [a.id] });
+  const c = M.createTask('C', { durationDays: 2, dependsOn: [a.id] });
+  const d = M.createTask('D', { durationDays: 1, dependsOn: [b.id, c.id] });
+  const sched = S.scheduleProject(proj([a, b, c, d]));
+  assert.equal(byName(sched, 'A').critical, true);
+  assert.equal(byName(sched, 'B').critical, true);
+  assert.equal(byName(sched, 'B').slackDays, 0);
+  assert.equal(byName(sched, 'C').critical, false);
+  assert.equal(byName(sched, 'C').slackDays, 3);
+  assert.equal(byName(sched, 'D').critical, true);
+});
+
+test('a standalone task is critical', () => {
+  const sched = S.scheduleProject(proj([M.createTask('A', { durationDays: 4 })]));
+  assert.equal(byName(sched, 'A').critical, true);
+  assert.equal(byName(sched, 'A').slackDays, 0);
+});
+
+test('sample project: expected critical chain and slack values', () => {
+  const sched = S.scheduleProject(M.sampleProject());
+  const names = ['Requirements', 'Wireframes', 'Visual design', 'Frontend build', 'Integration', 'Testing', 'Deploy'];
+  names.forEach(function (name) {
+    const r = byName(sched, name);
+    assert.equal(r.critical, true, name + ' should be critical');
+    assert.equal(r.slackDays, 0);
+  });
+  assert.equal(byName(sched, 'Backend build').critical, false);
+  assert.equal(byName(sched, 'Backend build').slackDays, 7);
+  assert.equal(byName(sched, 'Budget approval').slackDays, 23);
+});
+
+test('summary rows inherit criticality and minimum slack from subtasks', () => {
+  const phase = M.createTask('Phase', { durationDays: 9 });
+  const one = M.createTask('One', { parentId: phase.id, durationDays: 3 });
+  const two = M.createTask('Two', { parentId: phase.id, durationDays: 1 });
+  const sched = S.scheduleProject(proj([phase, one, two]));
+  const p = byName(sched, 'Phase');
+  assert.equal(p.critical, true);
+  assert.equal(p.slackDays, 0);
+  assert.equal(byName(sched, 'Two').critical, false);
+  assert.equal(byName(sched, 'Two').slackDays, 2);
+});
