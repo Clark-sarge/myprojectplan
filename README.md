@@ -9,6 +9,9 @@ No accounts, no server, no build step — everything runs locally in your browse
   create finish-to-start dependencies, and set optional "earliest start" constraints.
 - **Gantt page** — a waterfall-style Gantt chart with summary bars, dependency
   arrows, weekend shading, and a today marker, on its own page.
+- **Critical path** — the longest chain of dependent tasks is computed
+  (forward/backward pass) and highlighted in red; slack days per task are
+  shown in tooltips and the CSV export.
 - **CSV export** — download the full schedule (with computed dates) for Excel
   or any other tool.
 - **Auto-save** — your project is stored in your browser (localStorage). Nothing
@@ -36,10 +39,12 @@ Tip: click **Load sample** on the build page to see a full worked example.
 
 ```
 npm test
+npm run lint
 ```
 
-Unit tests (`node:test`, zero dependencies) cover data validation and the
-scheduling engine.
+Unit tests (`node:test`, zero runtime dependencies) cover data validation, the
+scheduling engine (including critical path and slack), and CSV output. ESLint
+and the test suite run in CI on every push (GitHub Actions).
 
 ## How scheduling works
 
@@ -61,6 +66,8 @@ scheduling engine.
 | Start Date | Computed start date (YYYY-MM-DD) |
 | End Date | Computed finish date (YYYY-MM-DD, inclusive) |
 | Duration (days) | Scheduled duration |
+| Critical | Yes if the task is on the critical path (zero slack) |
+| Slack (days) | Days the task can slip without delaying the project |
 | Depends On | Dependency names, semicolon-separated |
 | Notes | Free-form notes |
 
@@ -80,9 +87,9 @@ tests/          Unit tests (node:test)
 
 ## Roadmap
 
-**Phase 2 (planned):** milestones & percent complete · critical path
-highlighting · zoom controls · drag-to-reschedule · save/load `.json` project
-files · multiple named projects · print-friendly styling
+**Phase 2 (in progress):** ~~critical path highlighting~~ (done) · milestones &
+percent complete · zoom controls · drag-to-reschedule · save/load `.json`
+project files · multiple named projects · print-friendly styling
 
 **Phase 3 (future):** backend & user accounts · cloud sync and sharing ·
 PDF/PNG export · project templates · resource assignment · offline/PWA

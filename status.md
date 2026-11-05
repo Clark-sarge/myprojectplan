@@ -1,11 +1,22 @@
 # myProjectPlan — Project Status
 
-_Last updated: 2026-10-29_
+_Last updated: 2026-11-05_
 
-## Current state: Phase 1 (MVP) — COMPLETE ✅
+## Current state: Phase 2 in progress — critical path done ✅
 
-The app is fully usable end-to-end: enter tasks on the build page → build a
-waterfall Gantt chart → export to CSV. All work is committed on `main`.
+Phase 1 (MVP) is complete. The repo now lives on GitHub at
+https://github.com/Clark-sarge/myprojectplan with CI running lint + tests on
+every push. First Phase 2 feature shipped: critical path highlighting with
+slack tracking.
+
+## Completed (Phase 2, so far)
+
+| # | Deliverable | Commit |
+|---|---|---|
+| 1 | ESLint config + `npm run lint` | `8d3f623` |
+| 2 | GitHub Actions CI (lint + tests) | `b44521d` |
+| 3 | Critical path & slack in scheduler (backward pass) | `56ad72b` |
+| 4 | Critical path in Gantt, legend, CSV; slack tooltips | `2e56ce6` |
 
 ## Completed (Phase 1)
 
@@ -20,23 +31,30 @@ waterfall Gantt chart → export to CSV. All work is committed on `main`.
 
 ## Verification
 
-- 30/30 unit tests pass (`npm test` — validation + scheduling engine)
-- Headless smoke test of both pages' render paths + CSV output: PASSED
-- `node --check` clean on all JS files
+- 37/37 unit tests pass (`npm test` — validation, scheduling incl. critical
+  path & slack, CSV output)
+- `npm run lint` clean; `node --check` clean on all JS files
+- Headless smoke test of the render path (critical bars, arrows, marker,
+  legend, header): PASSED — 11 critical rects, 6 critical arrows, 3 normal
+- CI green on GitHub: https://github.com/Clark-sarge/myprojectplan/actions
 - Working tree: clean
 
 ## How to run
 
 Open `index.html` in a browser (no server needed), or `npm start`.
 Click **Load sample** → **Build Gantt Chart** → **Export CSV** for a full demo.
+On the chart, red bars/arrows mark the critical path (zero slack); hover a bar
+for its slack days.
 
 ## Phase 2 — Next up (priority order)
 
-1. Milestones & percent-complete tracking
-2. Critical path highlighting
-3. Zoom controls (day/week/month)
-4. Drag bars to reschedule
-5. Save/load project as .json files
+1. ~~Critical path highlighting~~ — done
+2. Save/load project as .json files
+3. Milestones & percent-complete tracking (add a normalize-on-load migration
+   for existing localStorage data)
+4. Zoom controls (day/week/month) — parameterize the scale in `renderChart`
+5. Drag bars to reschedule (drag = manual constraint overriding dependency
+   dates; conflicts shown as warnings)
 6. Multiple named projects
 7. Print-friendly styling
 
