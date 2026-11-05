@@ -115,18 +115,18 @@
     try {
       global.localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
       return true;
-    } catch (e) { return false; }
+    } catch { return false; }
   }
 
   function loadProject() {
     try {
       var raw = global.localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : null;
-    } catch (e) { return null; }
+    } catch { return null; }
   }
 
   function clearProject() {
-    try { global.localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    try { global.localStorage.removeItem(STORAGE_KEY); } catch { /* localStorage unavailable */ }
   }
 
   function sampleProject() {

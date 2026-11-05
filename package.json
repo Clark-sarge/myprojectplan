@@ -6,6 +6,12 @@
   "description": "Browser-based Gantt chart builder with CSV export",
   "scripts": {
     "test": "node --test",
+    "lint": "eslint .",
     "start": "npx serve ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0"
   }
 }
