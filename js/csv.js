@@ -1,7 +1,7 @@
 (function (global) {
   'use strict';
 
-  var COLUMNS = ['ID', 'Task', 'Type', 'Parent', 'Start Date', 'End Date', 'Duration (days)', 'Depends On', 'Notes'];
+  var COLUMNS = ['ID', 'Task', 'Type', 'Parent', 'Start Date', 'End Date', 'Duration (days)', 'Critical', 'Slack (days)', 'Depends On', 'Notes'];
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
 
@@ -33,6 +33,8 @@
         isoDate(row.startDate),
         isoDate(row.endDate),
         row.durationDays,
+        row.critical ? 'Yes' : 'No',
+        row.slackDays,
         depNames,
         row.notes || ''
       ].map(esc).join(','));

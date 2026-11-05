@@ -185,6 +185,7 @@ button[disabled] { opacity: 35%; cursor: default; }
 .sw-task { background: #2563eb; }
 .sw-sub { background: #60a5fa; }
 .sw-summary { background: #1e293b; height: 6px; }
+.sw-critical { background: #dc2626; }
 .sw-today {
   width: 0;
   height: 0;

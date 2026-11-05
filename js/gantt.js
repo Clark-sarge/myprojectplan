@@ -19,7 +19,9 @@
     taskStroke: '#1d4ed8',
     subtask: '#60a5fa',
     subtaskStroke: '#3b82f6',
-    summary: '#1e293b'
+    summary: '#1e293b',
+    critical: '#dc2626',
+    criticalStroke: '#b91c1c'
   };
 
   function el(name, attrs, parent) {
@@ -97,6 +99,16 @@
       orient: 'auto-start-reverse'
     }, defs);
     el('path', { d: 'M0,0 L10,5 L0,10 z', fill: COLORS.dep }, marker);
+    var critMarker = el('marker', {
+      id: 'dep-arrow-critical',
+      viewBox: '0 0 10 10',
+      refX: 9,
+      refY: 5,
+      markerWidth: 7,
+      markerHeight: 7,
+      orient: 'auto-start-reverse'
+    }, defs);
+    el('path', { d: 'M0,0 L10,5 L0,10 z', fill: COLORS.critical }, critMarker);
 
     // backgrounds
     el('rect', { x: 0, y: 0, width: chartW, height: chartH, fill: '#ffffff' }, svg);
@@ -206,22 +218,27 @@
         'Finish: ' + fmtDate(row.endDate) + '\n' +
         'Duration: ' + row.durationDays + ' day' + (row.durationDays === 1 ? '' : 's') +
         (depNames ? '\nDepends on: ' + depNames : '') +
-        (row.type === 'summary' ? '\nSummary — spans its subtasks' : '');
+        (row.type === 'summary' ? '\nSummary — spans its subtasks' : '') +
+        (row.critical ? '\nCritical path — no slack'
+          : '\nSlack: ' + row.slackDays + ' day' + (row.slackDays === 1 ? '' : 's'));
 
       if (row.type === 'summary') {
         var sy = cy - 5;
-        el('rect', { x: x, y: sy, width: w, height: 10, fill: COLORS.summary }, g);
+        var summaryFill = row.critical ? COLORS.critical : COLORS.summary;
+        el('rect', { x: x, y: sy, width: w, height: 10, fill: summaryFill }, g);
         el('polygon', {
           points: x + ',' + (sy - 3) + ' ' + (x + 9) + ',' + (sy + 5) + ' ' + x + ',' + (sy + 13),
-          fill: COLORS.summary
+          fill: summaryFill
         }, g);
         el('polygon', {
           points: (x + w) + ',' + (sy - 3) + ' ' + (x + w - 9) + ',' + (sy + 5) + ' ' + (x + w) + ',' + (sy + 13),
-          fill: COLORS.summary
+          fill: summaryFill
         }, g);
       } else {
-        var fill = row.type === 'subtask' ? COLORS.subtask : COLORS.task;
-        var stroke = row.type === 'subtask' ? COLORS.subtaskStroke : COLORS.taskStroke;
+        var fill = row.critical ? COLORS.critical
+          : row.type === 'subtask' ? COLORS.subtask : COLORS.task;
+        var stroke = row.critical ? COLORS.criticalStroke
+          : row.type === 'subtask' ? COLORS.subtaskStroke : COLORS.taskStroke;
         el('rect', {
           x: x, y: cy - 9, width: w, height: 18, rx: 4,
           fill: fill, stroke: stroke, 'stroke-width': 1
@@ -246,12 +263,13 @@
         var x2 = dayX(row.startDay);
         var y2 = rowCy(i);
         var midX = (x2 - 10 >= x1 + 10) ? x2 - 10 : x1 + 10;
+        var arrowCritical = row.critical && dep.critical;
         el('path', {
           d: 'M ' + x1 + ' ' + y1 + ' H ' + midX + ' V ' + y2 + ' H ' + (x2 - 1),
           fill: 'none',
-          stroke: COLORS.dep,
+          stroke: arrowCritical ? COLORS.critical : COLORS.dep,
           'stroke-width': 1.5,
-          'marker-end': 'url(#dep-arrow)'
+          'marker-end': arrowCritical ? 'url(#dep-arrow-critical)' : 'url(#dep-arrow)'
         }, svg);
       });
     });
@@ -279,6 +297,7 @@
       '<span class="lg"><span class="sw sw-task"></span>Task</span>' +
       '<span class="lg"><span class="sw sw-sub"></span>Subtask</span>' +
       '<span class="lg"><span class="sw sw-summary"></span>Summary</span>' +
+      '<span class="lg"><span class="sw sw-critical"></span>Critical</span>' +
       '<span class="lg"><svg width="26" height="10" viewBox="0 0 26 10" aria-hidden="true">' +
       '<line x1="0" y1="5" x2="18" y2="5" stroke="#64748b" stroke-width="1.5"/>' +
       '<path d="M18,1 L26,5 L18,9 z" fill="#64748b"/></svg>Dependency</span>' +
