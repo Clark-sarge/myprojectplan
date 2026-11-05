@@ -19,6 +19,9 @@ No accounts, no server, no build step — everything runs locally in your browse
 
 ## Getting started
 
+**Live demo:** https://clark-sarge.github.io/myprojectplan/ (hosted on GitHub
+Pages; your project data stays in your own browser)
+
 No installation required. Open `index.html` in any modern browser, or serve the
 folder over HTTP:
 

@@ -6,8 +6,10 @@ _Last updated: 2026-11-05_
 
 Phase 1 (MVP) is complete. The repo now lives on GitHub at
 https://github.com/Clark-sarge/myprojectplan with CI running lint + tests on
-every push. First Phase 2 feature shipped: critical path highlighting with
-slack tracking.
+every push, and the app is hosted live on GitHub Pages:
+https://clark-sarge.github.io/myprojectplan/ (auto-redeploys on every push to
+`main`). First Phase 2 feature shipped: critical path highlighting with slack
+tracking.
 
 ## Completed (Phase 2, so far)
 
